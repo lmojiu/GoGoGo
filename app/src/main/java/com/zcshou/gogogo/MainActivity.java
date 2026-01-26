@@ -326,9 +326,11 @@ public class MainActivity extends BaseActivity implements SensorEventListener {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 try {
+                    // 【关键修复】如果定位未成功，mCurrentCity 为空，会导致搜索失败，默认使用"中国"
+                    String searchCity = (mCurrentCity == null || mCurrentCity.isEmpty()) ? "中国" : mCurrentCity;
                     mSuggestionSearch.requestSuggestion((new SuggestionSearchOption())
                             .keyword(query)
-                            .city(mCurrentCity)
+                            .city(searchCity)
                     );
                     //搜索历史 插表参数
                     ContentValues contentValues = new ContentValues();
@@ -356,9 +358,11 @@ public class MainActivity extends BaseActivity implements SensorEventListener {
 
                 if (newText != null && !newText.isEmpty()) {
                     try {
+                        // 【关键修复】同上，输入文字变化时也要防止城市为空
+                        String searchCity = (mCurrentCity == null || mCurrentCity.isEmpty()) ? "中国" : mCurrentCity;
                         mSuggestionSearch.requestSuggestion((new SuggestionSearchOption())
                                 .keyword(newText)
-                                .city(mCurrentCity)
+                                .city(searchCity)
                         );
                     } catch (Exception e) {
                         GoUtils.DisplayToast(MainActivity.this, getResources().getString(R.string.app_error_search));
@@ -466,20 +470,37 @@ public class MainActivity extends BaseActivity implements SensorEventListener {
         });
         mBaiduMap.setOnMapClickListener(new BaiduMap.OnMapClickListener() {
             /**
-             * 单击地图
+             * 单击地图空白处
              */
             @Override
             public void onMapClick(LatLng point) {
                 mMarkLatLngMap = point;
+
+                // 【新增】给个临时名字，防止显示“重庆”这种旧名字
+                mMarkName = "选定位置";
+
                 markMap();
+
+                // 【新增】点击地图时，主动发起“查名字”请求（逆地理编码）
+                // 这样当你点北京时，它会去问百度“这是哪里”，然后更新 mMarkName
+                mGeoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(point));
             }
+
             /**
-             * 单击地图中的POI点
+             * 单击地图上的 POI 点（比如点击了地图上的“肯德基”图标）
+             * 【报错就是因为少了这个方法，必须加上！】
              */
             @Override
             public void onMapPoiClick(MapPoi poi) {
                 mMarkLatLngMap = poi.getPosition();
+
+                // 直接用 POI 的名字（比如“星巴克”）
+                mMarkName = poi.getName();
+
                 markMap();
+
+                // 同样发起一次详细地址查询，获取更详细的街道信息
+                mGeoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(poi.getPosition()));
             }
         });
         mBaiduMap.setOnMapLongClickListener(new BaiduMap.OnMapLongClickListener() {
@@ -650,7 +671,7 @@ public class MainActivity extends BaseActivity implements SensorEventListener {
         //可选，默认false，设置是否需要POI结果，可以在BDLocation.getPoiList里得到
         locationOption.setIsNeedLocationPoiList(false);
         //可选，默认false，设置是否收集CRASH信息，默认收集
-        locationOption.setIgnoreCacheException(true);
+        //locationOption.setIgnoreCacheException(true);
         //可选，默认false，设置是否开启Gps定位
         //locationOption.setOpenGps(true);
         locationOption.setOpenGnss(true);
@@ -918,8 +939,8 @@ public class MainActivity extends BaseActivity implements SensorEventListener {
     // 记录请求的位置信息
     private void recordCurrentLocation(double lng, double lat) {
         //参数坐标系：bd09
-        final String safeCode = BuildConfig.MAPS_SAFE_CODE;
-        final String ak = sharedPreferences.getString("setting_map_key", BuildConfig.MAPS_API_KEY);
+        final String safeCode = "";
+        final String ak = BuildConfig.MAPS_API_KEY;
         double[] latLng = MapUtils.bd2wgs(lng, lat);
         //bd09坐标的位置信息
         String mapApiUrl = "https://api.map.baidu.com/reverse_geocoding/v3/?ak=" + ak + "&output=json&coordtype=bd09ll" + "&location=" + lat + "," + lng + "&mcode=" + safeCode;
