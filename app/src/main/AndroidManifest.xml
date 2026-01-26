@@ -61,6 +61,10 @@
             android:name="org.apache.http.legacy"
             android:required="false" />
 
+        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="${BAIDU_MAP_AK}" />
+
         <!-- 百度地图 间隔定位必须配置此service否则功能无效 -->
         <service
             android:name="com.baidu.location.f"
