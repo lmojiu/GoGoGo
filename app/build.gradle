@@ -10,20 +10,20 @@ android {
     buildToolsVersion = '36.0.0'
     namespace = 'com.zcshou.gogogo'
 
-    signingConfigs {
+    /*signingConfigs {
         debug {
-            storeFile file('..\\keystore\\key.jks') //这里是你是新建的jks 文件的路径
+            storeFile file('..\\ys.jks') //这里是你是新建的jks 文件的路径
             storePassword '123456' //这个是你是新建的jks 文件的访问密码
             keyAlias 'key0'      //这个是你是新建的密钥的别名
             keyPassword '123456'   //这个是你是新建的密钥的密码
         }
         release {
-            storeFile file('..\\keystore\\key.jks') //这里是你是新建的jks 文件的路径
+            storeFile file('..\\ys.jks') //这里是你是新建的jks 文件的路径
             storePassword '123456' //这个是你是新建的jks 文件的访问密码
             keyAlias 'key0'      //这个是你是新建的密钥的别名
             keyPassword '123456'   //这个是你是新建的密钥的密码
         }
-    }
+    }*/
 
     defaultConfig {
         applicationId "com.zcshou.gogogo"
@@ -38,9 +38,9 @@ android {
             //noinspection ChromeOsAbiSupport
             abiFilters "arm64-v8a"
         }
-        signingConfig = signingConfigs.release
+        //signingConfig = signingConfigs.release
 
-        def myAK = "你的百度KEY"
+        def myAK = "nuccwiEQk2kTvgl3eF2rKYOxv8i4v3ei"
         manifestPlaceholders = [BAIDU_MAP_AK: myAK]
         buildConfigField "String", "MAPS_API_KEY", "\"${myAK}\""
     }
@@ -60,7 +60,7 @@ android {
             // R8 configuration files.
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-            signingConfig = signingConfigs.release
+            //signingConfig = signingConfigs.release
             multiDexEnabled = true
         }
         debug {
