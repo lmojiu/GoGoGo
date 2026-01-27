@@ -55,22 +55,6 @@ defaultConfig {
 android {
     // ... 其他配置
 
-    // 1. 配置签名信息
-    signingConfigs {
-        debug {
-            storeFile file('../keystore/key.jks') // 指向你的 .jks 文件路径
-            storePassword '你的密码'
-            keyAlias '你的别名'
-            keyPassword '你的密码'
-        }
-        release {
-            storeFile file('../keystore/key.jks') // 指向你的 .jks 文件路径
-            storePassword '你的密码'
-            keyAlias '你的别名'
-            keyPassword '你的密码'
-        }
-    }
-
     defaultConfig {
         // ... 其他配置
         // 填入百度地图 Key (AK)
